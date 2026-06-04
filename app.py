@@ -479,15 +479,8 @@ def lemonsqueezy_webhook():
     if event_name != "order_created":
         return jsonify({"status": "ignored"}), 200
 
-    # 提取自定义数据
-    custom = (
-        payload.get("data", {})
-        .get("attributes", {})
-        .get("first_order_item", {})
-        .get("product_options", {})
-        .get("checkout_data", {})
-        .get("custom", {})
-    )
+    # 提取自定义数据（在 meta.custom_data 中，不是 data 里）
+    custom = payload.get("meta", {}).get("custom_data", {})
     user_id = custom.get("user_id")
     package = custom.get("package", "25")
 
