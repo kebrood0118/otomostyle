@@ -94,6 +94,8 @@ T = {
     "dash_result_done":   {"zh": "转换完成",        "en": "Conversion Complete"},
     "dash_download_btn":  {"zh": "下载图片",        "en": "Download Image"},
     "dash_new_btn":       {"zh": "再转一张",        "en": "Convert Another"},
+    "dash_save_warning":  {"zh": "⚠️ 图片处理完成后即从服务器删除，请务必下载保存，以免丢失！",
+                           "en": "⚠️ Images are deleted from the server after processing. Please download and save your image!"},
     "dash_retry_btn":     {"zh": "重试",            "en": "Retry"},
     "dash_history_title": {"zh": "转换历史",        "en": "History"},
     "dash_history_empty": {"zh": "还没有转换记录，开始创作吧！", "en": "No conversions yet. Start creating!"},
