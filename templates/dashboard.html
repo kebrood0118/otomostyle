@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}{{ t('dash_title') }}{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- 顶部信息栏 -->
+    <div class="dash-header">
+        <div class="dash-user">
+            <h2>{{ t('dash_welcome') }}{{ user.username }}</h2>
+            <span class="dash-since">{{ t('dash_since') }}{{ user.created_at.strftime('%Y-%m-%d') }}</span>
+        </div>
+        <div class="dash-balance">
+            <span class="balance-label">{{ t('dash_my_points') }}</span>
+            <span class="balance-value" id="pointsBalance">{{ user.points }}</span>
+            <span class="balance-unit">{{ t('dash_points_unit') }}</span>
+            <a href="/pricing" class="btn btn-primary btn-sm">{{ t('dash_buy_points') }}</a>
+        </div>
+    </div>
+
+    <!-- 转换区域 -->
+    <div class="dash-main">
+        <div class="convert-panel">
+            <h3>{{ t('dash_upload_title') }}</h3>
+            <p class="convert-cost">{{ t('dash_cost_prefix') }}<strong>{{ config.POINTS_PER_CONVERSION }}</strong>{{ t('dash_cost_suffix') }}</p>
+
+            <!-- 上传区 -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <span class="upload-icon">📤</span>
+                    <p class="upload-text">{{ t('dash_drop_text') }}<span class="browse-link">{{ t('dash_browse') }}</span></p>
+                    <p class="upload-hint">{{ t('dash_drop_hint') }}</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+            </div>
+
+            <!-- 预览区 -->
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <div class="preview-container">
+                    <div class="preview-box">
+                        <p class="preview-label">{{ t('dash_original') }}</p>
+                        <img id="previewImage" src="" alt="预览">
+                    </div>
+                    <div class="preview-arrow">→</div>
+                    <div class="preview-box">
+                        <p class="preview-label">{{ t('dash_result') }}</p>
+                        <div id="resultContainer" class="result-placeholder">
+                            <span>{{ t('dash_waiting') }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="convertBtn">🎬 {{ t('dash_convert_btn') }}</button>
+                    <button class="btn btn-secondary" id="resetBtn">{{ t('dash_reset_btn') }}</button>
+                </div>
+                <p class="convert-reminder" id="pointsReminder">
+                    {{ t('dash_balance_prefix') }}<strong id="headerPoints">{{ user.points }}</strong> {{ t('dash_points_unit') }}
+                </p>
+            </div>
+
+            <!-- 转换中 -->
+            <div class="loading-section" id="loadingSection" style="display: none;">
+                <div class="spinner"></div>
+                <p class="loading-text">{{ t('dash_loading') }}</p>
+                <p class="loading-hint">{{ t('dash_loading_hint') }}</p>
+            </div>
+
+            <!-- 结果展示 -->
+            <div class="result-section" id="resultSection" style="display: none;">
+                <div class="result-container">
+                    <p class="result-label">✨ {{ t('dash_result_done') }}</p>
+                    <p class="result-points-info" id="resultPointsInfo"></p>
+                    <img id="resultImage" src="" alt="转换结果">
+                    <div class="result-actions">
+                        <a id="downloadBtn" class="btn btn-primary" download="otomo-style.png">💾 {{ t('dash_download_btn') }}</a>
+                        <button class="btn btn-secondary" id="newConvertBtn">🔄 {{ t('dash_new_btn') }}</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 错误提示 -->
+            <div class="error-section" id="errorSection" style="display: none;">
+                <div class="error-box">
+                    <span class="error-icon">⚠️</span>
+                    <p id="errorMessage"></p>
+                    <div class="error-actions">
+                        <button class="btn btn-secondary" id="errorRetryBtn">{{ t('dash_retry_btn') }}</button>
+                        <a href="/pricing" class="btn btn-primary" id="buyPointsBtn" style="display:none;">{{ t('dash_buy_points') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 转换历史 -->
+        <div class="history-panel">
+            <h3>{{ t('dash_history_title') }}</h3>
+            {% if recent %}
+            <div class="history-list">
+                {% for c in recent %}
+                <div class="history-item">
+                    <div class="history-info">
+                        <span class="history-filename">{{ c.original_filename }}</span>
+                        <span class="history-time">{{ c.created_at.strftime('%m-%d %H:%M') }}</span>
+                    </div>
+                    <span class="history-cost">-{{ c.points_cost }}{{ t('dash_history_cost') }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="history-empty">{{ t('dash_history_empty') }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/script.js"></script>
+{% endblock %}

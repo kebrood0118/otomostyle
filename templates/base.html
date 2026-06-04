@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="{{ 'en' if lang == 'en' else 'zh-CN' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ t('base_title') }}{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">OTOMOSTYLE</a>
+            <div class="nav-links">
+                <a href="/">{{ t('nav_home') }}</a>
+                <a href="/pricing">{{ t('nav_pricing') }}</a>
+                {% if session.user_id %}
+                    <a href="/dashboard">{{ t('nav_dashboard') }}</a>
+                    <span class="nav-points">💰 {{ user_points | default(0) }} {{ t('nav_points') }}</span>
+                    <a href="/logout" class="nav-btn-outline">{{ t('nav_logout') }}</a>
+                {% else %}
+                    <a href="/login">{{ t('nav_login') }}</a>
+                    <a href="/register" class="nav-btn">{{ t('nav_register') }}</a>
+                {% endif %}
+
+                <!-- 语言选择器 -->
+                <div class="nav-lang" id="langSelector">
+                    <button class="lang-current" id="langBtn">{{ '中文' if lang == 'en' else 'Language' }}</button>
+                    <div class="lang-dropdown" id="langDropdown">
+                        <a href="/set-language/zh" class="{{ 'active' if lang == 'zh' }}">{{ t('lang_zh') }}</a>
+                        <a href="/set-language/en" class="{{ 'active' if lang == 'en' }}">{{ t('lang_en') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast 悬浮提示 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container" id="toastContainer">
+        {% for category, message in messages %}
+        <div class="toast toast-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- 页面内容 -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>OTOMOSTYLE</p>
+        <p class="footer-sub">{{ t('footer_tagline') }}</p>
+    </footer>
+
+    <!-- 前端 I18N -->
+    <script>
+    window.I18N = {
+        lang: "{{ lang }}",
+        bad_format: "{{ t('js_bad_format') }}",
+        file_too_large: "{{ t('js_file_too_large') }}",
+        login_required: "{{ t('js_login_required') }}",
+        convert_failed: "{{ t('js_convert_failed') }}",
+        points_format: "{{ t('js_points_format') }}",
+        points_unit: "{{ t('nav_points') }}",
+        waiting: "{{ t('js_waiting') }}"
+    };
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+
+    <!-- Toast 自动消失 -->
+    <script>
+    (function() {
+        var toasts = document.querySelectorAll('.toast');
+        toasts.forEach(function(t) {
+            setTimeout(function() { t.classList.add('toast-out'); }, 2500);
+            setTimeout(function() { t.remove(); }, 2800);
+        });
+    })();
+    </script>
+
+    <!-- 语言下拉菜单 -->
+    <script>
+    (function() {
+        var btn = document.getElementById('langBtn');
+        var dd = document.getElementById('langDropdown');
+        if (btn && dd) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dd.classList.toggle('show');
+            });
+            document.addEventListener('click', function() {
+                dd.classList.remove('show');
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

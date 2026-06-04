@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ t('pricing_title') }}{% endblock %}
+
+{% block content %}
+<div class="pricing-page">
+    <h1>{{ t('pricing_heading') }}</h1>
+
+    <div class="package-grid package-grid-full">
+        <div class="package-card">
+            <h3>{{ t('pkg_label_a') }}</h3>
+            <p class="package-points">25 {{ t('dash_points_unit') }}</p>
+            {% if lang == 'en' %}
+            <p class="package-price">$1.49</p>
+            {% else %}
+            <p class="package-price">¥9.9</p>
+            {% endif %}
+            {% if session.user_id %}
+            <button class="btn btn-primary btn-block checkout-btn" data-package="25">{{ t('pkg_btn_buy') }}</button>
+            {% else %}
+            <a href="/login" class="btn btn-primary btn-block">{{ t('pkg_btn_login') }}</a>
+            {% endif %}
+        </div>
+
+        <div class="package-card featured">
+            <span class="badge">🔥 {{ t('pkg_badge') }}</span>
+            <h3>{{ t('pkg_label_b') }}</h3>
+            <p class="package-points">55 {{ t('dash_points_unit') }}</p>
+            {% if lang == 'en' %}
+            <p class="package-price">$2.99</p>
+            {% else %}
+            <p class="package-price">¥19.9</p>
+            {% endif %}
+            {% if session.user_id %}
+            <button class="btn btn-primary btn-block checkout-btn" data-package="55">{{ t('pkg_btn_buy') }}</button>
+            {% else %}
+            <a href="/login" class="btn btn-primary btn-block">{{ t('pkg_btn_login') }}</a>
+            {% endif %}
+        </div>
+
+        <div class="package-card">
+            <h3>{{ t('pkg_label_c') }}</h3>
+            <p class="package-points">120 {{ t('dash_points_unit') }}</p>
+            {% if lang == 'en' %}
+            <p class="package-price">$5.99</p>
+            {% else %}
+            <p class="package-price">¥39.9</p>
+            {% endif %}
+            {% if session.user_id %}
+            <button class="btn btn-primary btn-block checkout-btn" data-package="120">{{ t('pkg_btn_buy') }}</button>
+            {% else %}
+            <a href="/login" class="btn btn-primary btn-block">{{ t('pkg_btn_login') }}</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <p class="pricing-note">
+        {% if lang == 'en' %}{{ t('pricing_note_en') }}{% else %}{{ t('pricing_note_zh') }}{% endif %}
+    </p>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    var btns = document.querySelectorAll('.checkout-btn');
+    btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var pkg = this.dataset.package;
+            var originalText = this.textContent;
+            this.disabled = true;
+            this.textContent = '...';
+
+            fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'package=' + pkg
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert(data.error || '创建支付链接失败');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            })
+            .catch(function(err) {
+                alert('网络错误，请重试');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            });
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{{ t('index_title') }}{% endblock %}
+
+{% block content %}
+<!-- 图片展示区 -->
+<section class="showcase">
+    <div class="showcase-slider" id="showcaseSlider">
+        <div class="showcase-slide active">
+            <div class="showcase-image" style="background-image: url('/static/images/showcase-1.jpg');"></div>
+        </div>
+        <div class="showcase-slide">
+            <div class="showcase-image" style="background-image: url('/static/images/showcase-2.jpg');"></div>
+        </div>
+        <div class="showcase-slide">
+            <div class="showcase-image" style="background-image: url('/static/images/showcase-3.jpg');"></div>
+        </div>
+    </div>
+    <!-- 轮播指示器 -->
+    <div class="showcase-dots" id="showcaseDots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+    </div>
+    <!-- 叠加文字 -->
+    <div class="showcase-overlay">
+        <h1>{{ t('hero_line1') }}<span class="gradient-text">{{ t('hero_line2') }}</span></h1>
+        <div class="showcase-actions">
+            {% if session.user_id %}
+                <a href="/dashboard" class="btn btn-primary btn-lg">{{ t('hero_start') }}</a>
+            {% else %}
+                <a href="/register" class="btn btn-primary btn-lg">{{ t('hero_register') }}</a>
+                <a href="/login" class="btn btn-secondary btn-lg">{{ t('hero_login_link') }}</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- 为什么选择 OTOMOSTYLE -->
+<section class="features">
+    <h2>{{ t('features_title') }}</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <span class="feature-icon">⚡</span>
+            <h3>{{ t('feat_speed_title') }}</h3>
+            <p>{{ t('feat_speed_desc') }}</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🎨</span>
+            <h3>{{ t('feat_style_title') }}</h3>
+            <p>{{ t('feat_style_desc') }}</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🔒</span>
+            <h3>{{ t('feat_privacy_title') }}</h3>
+            <p>{{ t('feat_privacy_desc') }}</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">💰</span>
+            <h3>{{ t('feat_pay_title') }}</h3>
+            <p>{{ t('feat_pay_desc') }}</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    const slides = document.querySelectorAll('.showcase-slide');
+    const dots = document.querySelectorAll('.dot');
+    let current = 0;
+    const total = slides.length;
+    let timer;
+
+    function goTo(index) {
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = ((index % total) + total) % total;
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+    }
+
+    function next() { goTo(current + 1); }
+
+    function startAuto() {
+        timer = setInterval(next, 4000);
+    }
+
+    dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            clearInterval(timer);
+            goTo(parseInt(this.dataset.index));
+            startAuto();
+        });
+    });
+
+    startAuto();
+})();
+</script>
+{% endblock %}
