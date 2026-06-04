@@ -79,6 +79,14 @@ def login_required(f):
                 return jsonify({"error": t("login_required")}), 401
             flash(t("login_required"), "warning")
             return redirect(url_for("login"))
+        # 确认用户仍然存在（数据库重置后可能不存在）
+        user = db.session.get(User, session["user_id"])
+        if user is None:
+            session.clear()
+            if request.is_json or request.path.startswith("/api/"):
+                return jsonify({"error": t("login_required")}), 401
+            flash(t("login_required"), "warning")
+            return redirect(url_for("login"))
         return f(*args, **kwargs)
     return decorated
 
@@ -95,6 +103,11 @@ def inject_user():
         user = db.session.get(User, session["user_id"])
         if user:
             ctx["user_points"] = user.points
+        else:
+            # 用户已被删除（如数据库重置），清理 session
+            session.clear()
+            if lang:
+                session["lang"] = lang
     return ctx
 
 
