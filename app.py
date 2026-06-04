@@ -50,6 +50,10 @@ db.init_app(app)
 Path(Config.UPLOAD_FOLDER).mkdir(exist_ok=True)
 Path("instance").mkdir(exist_ok=True)
 
+# 确保数据库表已创建（gunicorn 启动时不会走 __main__ 分支）
+with app.app_context():
+    db.create_all()
+
 # 大友克洋画风 Prompt
 OTOMO_PROMPT = (
     "Akira manga style, Katsuhiro Otomo art style, "
