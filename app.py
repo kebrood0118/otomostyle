@@ -461,14 +461,14 @@ def creem_webhook():
             return jsonify({"error": "签名验证失败"}), 403
 
     payload = request.get_json(force=True)
-    event_type = payload.get("type", "")
+    event_type = payload.get("eventType", "")
 
     # 只处理支付完成事件
     if event_type != "checkout.completed":
         return jsonify({"status": "ignored"}), 200
 
-    # 提取自定义数据
-    metadata = payload.get("metadata", {})
+    # 提取自定义数据（在 object.metadata 中）
+    metadata = payload.get("object", {}).get("metadata", {})
     user_id = metadata.get("user_id")
     package = metadata.get("package", "25")
 
