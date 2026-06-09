@@ -389,66 +389,45 @@ def recharge():
 
 
 # ============================================================
-# Lemon Squeezy 支付
+# Creem 支付
 # ============================================================
+
+def _creem_api_url():
+    return "https://test-api.creem.io" if Config.CREEM_TEST_MODE else "https://api.creem.io"
+
 
 @app.route("/api/checkout", methods=["POST"])
 @login_required
 def checkout():
-    """创建 Lemon Squeezy Checkout，返回支付页面 URL"""
+    """创建 Creem Checkout，返回支付页面 URL"""
     package = request.form.get("package", "25")
-    variant_id = Config.LEMONSQUEEZY_VARIANTS.get(package)
+    product_id = Config.CREEM_PRODUCTS.get(package)
 
-    if not variant_id:
+    if not product_id:
         return jsonify({"error": t("invalid_package")}), 400
 
     user = User.query.get(session["user_id"])
     if not user:
         return jsonify({"error": t("user_not_found")}), 404
 
-    api_key = app.config.get("LEMONSQUEEZY_API_KEY")
-    store_id = app.config.get("LEMONSQUEEZY_STORE_ID")
-
-    if not api_key or not store_id:
+    api_key = app.config.get("CREEM_API_KEY")
+    if not api_key:
         return jsonify({"error": "支付服务暂未配置"}), 500
 
     try:
         resp = requests.post(
-            "https://api.lemonsqueezy.com/v1/checkouts",
+            f"{_creem_api_url()}/v1/checkouts",
             headers={
-                "Authorization": f"Bearer {api_key}",
-                "Accept": "application/json",
-                "Content-Type": "application/vnd.api+json",
+                "x-api-key": api_key,
+                "Content-Type": "application/json",
             },
             json={
-                "data": {
-                    "type": "checkouts",
-                    "attributes": {
-                        "checkout_data": {
-                            "custom": {
-                                "user_id": str(user.id),
-                                "package": package,
-                            }
-                        },
-                        "product_options": {
-                            "redirect_url": url_for("dashboard", _external=True),
-                        },
-                    },
-                    "relationships": {
-                        "store": {
-                            "data": {
-                                "type": "stores",
-                                "id": store_id,
-                            }
-                        },
-                        "variant": {
-                            "data": {
-                                "type": "variants",
-                                "id": variant_id,
-                            }
-                        },
-                    },
-                }
+                "product_id": product_id,
+                "success_url": url_for("dashboard", _external=True),
+                "metadata": {
+                    "user_id": str(user.id),
+                    "package": package,
+                },
             },
             timeout=15,
         )
@@ -457,11 +436,7 @@ def checkout():
         return jsonify({"error": f"创建支付链接失败: {str(e)}"}), 500
 
     data = resp.json()
-    checkout_url = (
-        data.get("data", {})
-        .get("attributes", {})
-        .get("url", "")
-    )
+    checkout_url = data.get("checkout_url", "")
 
     if not checkout_url:
         return jsonify({"error": "支付链接为空"}), 500
@@ -469,15 +444,15 @@ def checkout():
     return jsonify({"url": checkout_url})
 
 
-@app.route("/api/webhook/lemonsqueezy", methods=["POST"])
-def lemonsqueezy_webhook():
-    """接收 Lemon Squeezy Webhook，验证签名后给用户加积分"""
-    secret = app.config.get("LEMONSQUEEZY_WEBHOOK_SECRET", "")
+@app.route("/api/webhook/creem", methods=["POST"])
+def creem_webhook():
+    """接收 Creem Webhook，验证签名后给用户加积分"""
+    secret = app.config.get("CREEM_WEBHOOK_SECRET", "")
 
     # 验证签名
     if secret:
         raw_body = request.get_data()
-        signature = request.headers.get("X-Signature", "")
+        signature = request.headers.get("creem-signature", "")
         computed = hmac.new(
             secret.encode(), raw_body, hashlib.sha256
         ).hexdigest()
@@ -486,16 +461,16 @@ def lemonsqueezy_webhook():
             return jsonify({"error": "签名验证失败"}), 403
 
     payload = request.get_json(force=True)
-    event_name = payload.get("meta", {}).get("event_name", "")
+    event_type = payload.get("type", "")
 
-    # 只处理订单创建事件
-    if event_name != "order_created":
+    # 只处理支付完成事件
+    if event_type != "checkout.completed":
         return jsonify({"status": "ignored"}), 200
 
-    # 提取自定义数据（在 meta.custom_data 中，不是 data 里）
-    custom = payload.get("meta", {}).get("custom_data", {})
-    user_id = custom.get("user_id")
-    package = custom.get("package", "25")
+    # 提取自定义数据
+    metadata = payload.get("metadata", {})
+    user_id = metadata.get("user_id")
+    package = metadata.get("package", "25")
 
     points_map = {"25": 25, "55": 55, "120": 120}
     points = points_map.get(package, 25)

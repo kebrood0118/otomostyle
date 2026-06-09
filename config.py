@@ -31,12 +31,12 @@ class Config:
     # 点数
     POINTS_PER_CONVERSION = 3  # 转换一张消耗的积分
 
-    # Lemon Squeezy 支付
-    LEMONSQUEEZY_API_KEY = os.getenv("LEMONSQUEEZY_API_KEY", "")
-    LEMONSQUEEZY_STORE_ID = os.getenv("LEMONSQUEEZY_STORE_ID", "")
-    LEMONSQUEEZY_WEBHOOK_SECRET = os.getenv("LEMONSQUEEZY_WEBHOOK_SECRET", "")
-    LEMONSQUEEZY_VARIANTS = {
-        "25": os.getenv("LEMONSQUEEZY_VARIANT_25", ""),
-        "55": os.getenv("LEMONSQUEEZY_VARIANT_55", ""),
-        "120": os.getenv("LEMONSQUEEZY_VARIANT_120", ""),
+    # Creem 支付
+    CREEM_API_KEY = os.getenv("CREEM_API_KEY", "")
+    CREEM_WEBHOOK_SECRET = os.getenv("CREEM_WEBHOOK_SECRET", "")
+    CREEM_TEST_MODE = os.getenv("CREEM_TEST_MODE", "true") == "true"
+    CREEM_PRODUCTS = {
+        "25": os.getenv("CREEM_PRODUCT_25", ""),
+        "55": os.getenv("CREEM_PRODUCT_55", ""),
+        "120": os.getenv("CREEM_PRODUCT_120", ""),
     }

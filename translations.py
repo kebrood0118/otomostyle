@@ -45,10 +45,10 @@ T = {
     "pkg_badge":         {"zh": "推荐",           "en": "Popular"},
     "pkg_btn_buy":       {"zh": "立即购买",        "en": "Buy Now"},
     "pkg_btn_login":     {"zh": "登录后购买",      "en": "Login to Buy"},
-    "pricing_note_zh":   {"zh": "💡 支付由 Lemon Squeezy 安全处理，支持信用卡、PayPal 等多种方式。",
+    "pricing_note_zh":   {"zh": "💡 支付由 Creem 安全处理，支持信用卡、支付宝等多种方式。",
                           "en": ""},
     "pricing_note_en":   {"zh": "",
-                          "en": "💡 Payments are securely processed by Lemon Squeezy. Credit cards, PayPal and more accepted."},
+                          "en": "💡 Payments are securely processed by Creem. Credit cards, Alipay and more accepted."},
 
     # ---- Login ----
     "login_title":       {"zh": "登录 — OTOMOSTYLE", "en": "Login — OTOMOSTYLE"},
