@@ -13,11 +13,12 @@ class Config:
     # Flask
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
-    # SQLite 数据库（文件保存在 instance/ 目录）
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL",
-        f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'app.db')}",
-    )
+    # 数据库：优先用 DATABASE_URL（如 Render PostgreSQL），否则本地 SQLite
+    _db_url = os.getenv("DATABASE_URL", "")
+    if _db_url:
+        SQLALCHEMY_DATABASE_URI = _db_url.replace("postgres://", "postgresql://", 1)
+    else:
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'app.db')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # 上传
