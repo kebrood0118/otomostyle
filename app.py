@@ -126,6 +126,16 @@ def pricing():
     return render_template("pricing.html")
 
 
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
 @app.route("/set-language/<lang>")
 def set_language(lang):
     """切换界面语言"""
@@ -290,6 +300,26 @@ def convert():
         return jsonify({"error": t("no_api_token")}), 500
 
     try:
+        # 3.5 Creem 内容审核（AI 图片产品合规要求）
+        creem_key = app.config.get("CREEM_API_KEY")
+        if creem_key and not Config.CREEM_TEST_MODE:
+            try:
+                mod_resp = requests.post(
+                    f"{_creem_api_url()}/v1/moderation/prompt",
+                    headers={"x-api-key": creem_key, "Content-Type": "application/json"},
+                    json={"prompt": OTOMO_PROMPT},
+                    timeout=5,
+                )
+                mod_data = mod_resp.json() if mod_resp.ok else {}
+                decision = mod_data.get("decision", "allow")
+                if decision != "allow":
+                    filepath.unlink()
+                    return jsonify({"error": "内容不符合平台规定，请更换照片重试"}), 400
+            except requests.RequestException:
+                # 审核 API 调用失败时拒绝生成（fail closed）
+                filepath.unlink()
+                return jsonify({"error": "内容审核服务异常，请稍后重试"}), 500
+
         # 4. 调用 Replicate API
         with open(filepath, "rb") as img_file:
             output = replicate.run(
