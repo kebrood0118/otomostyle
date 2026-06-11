@@ -305,12 +305,14 @@ def convert():
         return jsonify({"error": t("no_api_token")}), 500
 
     try:
-        # 3.5 Creem 内容审核（AI 图片产品合规要求）
+        # 3.5 Creem 内容审核（AI 图片产品合规要求，始终走生产环境）
         creem_key = app.config.get("CREEM_API_KEY")
-        if creem_key and not Config.CREEM_TEST_MODE:
+        if creem_key:
             try:
+                # 内容审核始终使用生产环境 API
+                mod_url = "https://api.creem.io/v1/moderation/prompt"
                 mod_resp = requests.post(
-                    f"{_creem_api_url()}/v1/moderation/prompt",
+                    mod_url,
                     headers={"x-api-key": creem_key, "Content-Type": "application/json"},
                     json={"prompt": OTOMO_PROMPT},
                     timeout=5,
