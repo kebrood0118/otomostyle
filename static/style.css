@@ -529,6 +529,11 @@ body {
 .footer-legal a { color: var(--text-muted); text-decoration: none; }
 .footer-legal a:hover { color: var(--accent); }
 
+/* ===== AI 透明声明 ===== */
+.disclaimer-section { max-width: 720px; margin: 32px auto 0; padding: 0 24px; text-align: center; }
+.disclaimer-section p { color: var(--text-muted); font-size: 0.7rem; opacity: 0.5; line-height: 1.6; }
+.disclaimer-section a { color: var(--text-muted); }
+
 /* ===== 法律页面 ===== */
 .legal-page { max-width: 720px; margin: 0 auto; padding: 60px 24px; }
 .legal-page h1 { font-size: 1.5rem; margin-bottom: 8px; }

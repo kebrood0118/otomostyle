@@ -81,3 +81,47 @@
 ### 待办
 - [ ] 购买域名和主机，部署上线
 - [ ] 上线后验证 Webhook 自动加积分功能
+
+### 部署准备（6/4）
+- ✅ 购买域名：otomostyle.cc（Cloudflare 注册）
+- ✅ 初始化 git，提交代码（19个文件）
+- ✅ 添加 gunicorn 到 requirements.txt
+- ✅ 推送到 GitHub：kebrood0118/otomostyle
+### 部署上线（6/4）
+- ✅ Render Web Service 部署成功
+- ✅ 线上地址：https://otomostyle.onrender.com
+- ✅ 自定义域名：https://otomostyle.cc（Cloudflare 购买 + Render 绑定）
+- ✅ SSL 证书自动颁发
+- ✅ 首页/注册/登录正常
+- ✅ Webhook 路径修复：custom_data 从 meta.custom_data 读取
+- ✅ 数据库重置容错：用户不存在时自动清理 session
+- ✅ Lemon Squeezy Webhook URL 更新为自定义域名
+- ✅ 完整支付闭环测试通过：购买 → 跳转 Lemon Squeezy → 支付 → Webhook → 积分到账
+
+### 待办
+### 支付切换 + 数据库升级（6/4 晚 ~ 6/5）
+- ⚠️ Lemon Squeezy 不支持中国大陆提现
+- ⚠️ Payoneer Checkout 需香港公司 + $20k/月门槛，个人无法使用
+- 🔄 找到 Creem：个人身份证可用，支持支付宝提现，3.9%手续费
+- ✅ Creem 测试模式支付闭环验证通过
+- ✅ Webhook 回调数据格式修正（eventType + object.metadata）
+- ✅ 数据库升级到 Render PostgreSQL（免费），彻底解决部署丢数据问题
+- ✅ 已清除测试用户数据，准备正式测试
+- 🔄 Creem 正式模式切换中：API 直调验证通过（200），待 Render 环境变量同步后测试
+
+### 关键教训
+- **中国个人开发者海外收款**：Stripe/PayPal/Lemon Squeezy/Payoneer 都有门槛，**Creem** 目前是唯一可行的 MoR 平台
+- **支付平台测试→正式**：测试和正式是两套独立系统（API Key、Product ID 都不同），切换时注意逐项核对
+- **Render 部署**：环境变量改动后需要 Manual Deploy 才会生效
+
+### Creem 合规准备（6/5）
+- ✅ KYC 身份验证通过
+- ✅ 银行提现账户绑定完成
+- ✅ 内容审核 API 集成（AI 生成前调 Creem Moderation API，fail closed）
+- ✅ 法律页面：Privacy Policy + Terms of Service（双语）
+- ✅ 页脚添加法律链接 + 客服邮箱 support@otomostyle.cc
+- 🔄 Creem 账号审核中（24-48h），审核通过后即可正式收款
+
+### 待办
+- [ ] Creem 审核通过 → 切正式模式 → 真实付款验证
+- [ ] 正式上线运营

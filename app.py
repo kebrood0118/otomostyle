@@ -136,6 +136,11 @@ def terms():
     return render_template("terms.html")
 
 
+@app.route("/aup")
+def aup():
+    return render_template("aup.html")
+
+
 @app.route("/set-language/<lang>")
 def set_language(lang):
     """切换界面语言"""
